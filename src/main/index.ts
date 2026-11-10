@@ -88,12 +88,6 @@ function createWindow(): BrowserWindow {
   // A plain link click would otherwise replace the reader with the target page
   win.webContents.on('will-navigate', (event, url) => {
     if (url === win.webContents.getURL()) return
-    if (
-      is.dev &&
-      process.env['ELECTRON_RENDERER_URL'] &&
-      url.startsWith(process.env['ELECTRON_RENDERER_URL'])
-    )
-      return
     event.preventDefault()
     handleLink(url)
   })
@@ -121,8 +115,14 @@ function handleLink(url: string): void {
     shell.openExternal(parsed.href)
     return
   }
-  if (parsed.protocol === 'file:') {
-    const filePath = fileURLToPath(parsed)
+  // A host means a network share: touching it would send Windows credentials
+  if (parsed.protocol === 'file:' && parsed.host === '') {
+    let filePath: string
+    try {
+      filePath = fileURLToPath(parsed)
+    } catch {
+      return
+    }
     if (ALLOWED_EXTENSIONS.has(extname(filePath).toLowerCase()) && existsSync(filePath)) {
       openPathInWindow(filePath)
     }
@@ -255,6 +255,8 @@ if (!app.requestSingleInstanceLock()) {
 
     ipcMain.handle('window:setTitle', (event, title: string) => {
       const win = BrowserWindow.fromWebContents(event.sender)
+      // Dropped files without a path set their own title; keep it for language switches
+      currentFileName = title ? title.split(' — ')[0] : null
       if (win) {
         win.setTitle(title || msg('appTitle'))
       }

@@ -24,10 +24,15 @@ function bionicStemLength(word: string): number {
   return Math.ceil(word.length * 0.45)
 }
 
+// Parsing into <body> directly (not a wrapper <div>) so a stray </div> in the
+// document cannot close the wrapper early and drop the rest of the text
+function parseFragment(html: string): { doc: Document; root: HTMLElement } {
+  const doc = new DOMParser().parseFromString(html, 'text/html')
+  return { doc, root: doc.body }
+}
+
 export function applyBionic(html: string): string {
-  const doc = new DOMParser().parseFromString(`<div>${html}</div>`, 'text/html')
-  const root = doc.body.firstElementChild
-  if (!root) return html
+  const { doc, root } = parseFragment(html)
 
   const walker = doc.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
     acceptNode(node) {
@@ -85,7 +90,7 @@ export function detectDirection(text: string): 'rtl' | 'ltr' | null {
   return rtl >= latin ? 'rtl' : 'ltr'
 }
 
-const DIRECTION_BLOCKS = 'p, h1, h2, h3, h4, h5, h6, li, ul, ol, blockquote, table, dt, dd'
+const DIRECTION_BLOCKS = 'p, h1, h2, h3, h4, h5, h6, li, ul, ol, blockquote, table, th, td, dt, dd'
 const DIRECTION_IGNORED = new Set(['CODE', 'PRE', 'KBD', 'SAMP'])
 
 function proseText(el: Element): string {
@@ -106,9 +111,7 @@ function proseText(el: Element): string {
 
 /** Gives each block its own direction unless the author already chose one. */
 export function annotateDirection(html: string): string {
-  const doc = new DOMParser().parseFromString(`<div>${html}</div>`, 'text/html')
-  const root = doc.body.firstElementChild
-  if (!root) return html
+  const { root } = parseFragment(html)
 
   const authored = new Set(Array.from(root.querySelectorAll('[dir]')))
   const isAuthored = (el: Element): boolean => {
@@ -128,6 +131,9 @@ export function annotateDirection(html: string): string {
 
 const HAS_SCHEME = /^[a-z][a-z0-9+.-]*:/i
 const WINDOWS_ABSOLUTE = /^[a-z]:[\\/]/i
+// file://host/..., \\host\..., //host/... all reach out over SMB on Windows,
+// which sends the user's NTLM credentials just by rendering an image
+const NETWORK_PATH = /^(?:file:\/\/[^/]|\\\\|\/\/)/i
 
 function toFileUrl(path: string): string {
   const parts: string[] = []
@@ -148,24 +154,42 @@ function safeDecode(value: string): string {
   }
 }
 
-/** Points relative image paths at the folder of the open document. */
-export function resolveImageSources(html: string, fileDir: string): string {
-  if (!fileDir) return html
-  const doc = new DOMParser().parseFromString(`<div>${html}</div>`, 'text/html')
-  const root = doc.body.firstElementChild
-  if (!root) return html
+const URL_ATTRIBUTES: [selector: string, attribute: string][] = [
+  ['img[src]', 'src'],
+  ['a[href]', 'href']
+]
 
-  for (const img of Array.from(root.querySelectorAll('img[src]'))) {
-    const src = safeDecode(img.getAttribute('src') ?? '')
-    if (!src || src.startsWith('#') || src.startsWith('//')) continue
-    if (WINDOWS_ABSOLUTE.test(src)) {
-      img.setAttribute('src', toFileUrl(src))
-      continue
+/**
+ * Points relative image and link URLs at the folder of the open document and
+ * strips network file paths. Without a local folder, relative URLs are left
+ * as they are.
+ */
+export function resolveRelativeUrls(html: string, fileDir: string): string {
+  const { root } = parseFragment(html)
+  const canResolve = fileDir !== '' && !NETWORK_PATH.test(fileDir)
+  let changed = false
+
+  for (const [selector, attribute] of URL_ATTRIBUTES) {
+    for (const el of Array.from(root.querySelectorAll(selector))) {
+      const raw = el.getAttribute(attribute) ?? ''
+      const url = safeDecode(raw)
+      if (NETWORK_PATH.test(url)) {
+        el.removeAttribute(attribute)
+        changed = true
+        continue
+      }
+      if (!canResolve || !url || url.startsWith('#')) continue
+      if (WINDOWS_ABSOLUTE.test(url)) {
+        el.setAttribute(attribute, toFileUrl(url))
+        changed = true
+        continue
+      }
+      if (HAS_SCHEME.test(url) || url.startsWith('/')) continue
+      el.setAttribute(attribute, toFileUrl(`${fileDir}/${url}`))
+      changed = true
     }
-    if (HAS_SCHEME.test(src) || src.startsWith('/')) continue
-    img.setAttribute('src', toFileUrl(`${fileDir}/${src}`))
   }
-  return root.innerHTML
+  return changed ? root.innerHTML : html
 }
 
 export function countWords(source: string): number {

@@ -2,8 +2,9 @@
   import {
     annotateDirection,
     applyBionic,
+    detectDirection,
     renderMarkdown,
-    resolveImageSources
+    resolveRelativeUrls
   } from '$lib/utils/markdown'
   import { settings } from '$lib/stores/settings'
 
@@ -24,10 +25,14 @@
   let units: HTMLElement[] = []
   let activeIndex = -1
 
-  let html = $derived.by(() => {
-    const rendered = resolveImageSources(annotateDirection(renderMarkdown(content)), fileDir)
-    return $settings.bionic ? applyBionic(rendered) : rendered
-  })
+  // Split so slider and theme changes don't re-parse the whole document:
+  // only content, folder and the bionic toggle affect the HTML
+  const base = $derived(resolveRelativeUrls(annotateDirection(renderMarkdown(content)), fileDir))
+  const bionic = $derived($settings.bionic)
+  const html = $derived(bionic ? applyBionic(base) : base)
+  // Fallback for blocks without letters (images, numbers, rules) follows the
+  // document, not the interface language
+  const documentDir = $derived(detectDirection(content) ?? undefined)
 
   function setActive(index: number, scroll: boolean): void {
     if (index < 0 || index >= units.length) return
@@ -80,6 +85,7 @@
   bind:this={articleEl}
   class="markdown-body mx-auto px-6 pb-24 pt-24"
   class:spotlight={$settings.spotlight}
+  dir={documentDir}
   style:max-width={WIDTHS[$settings.contentWidth]}
   style:--reader-font-size="{$settings.fontSize}px"
   style:--reader-font-weight={$settings.fontWeight}

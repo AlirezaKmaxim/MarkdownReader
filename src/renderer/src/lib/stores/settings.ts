@@ -88,7 +88,11 @@ function systemLanguage(): string {
   return typeof navigator !== 'undefined' ? navigator.language : 'en'
 }
 
+let appliedLocale: Locale | null = null
+
 function applyLocale(locale: Locale): void {
+  if (locale === appliedLocale) return
+  appliedLocale = locale
   const root = document.documentElement
   root.lang = locale
   root.dir = directionOf(locale)
