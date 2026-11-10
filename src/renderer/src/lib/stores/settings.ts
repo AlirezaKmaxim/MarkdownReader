@@ -1,12 +1,6 @@
 import { derived, writable } from 'svelte/store'
 import { getTheme, isThemeId, THEMES, type ThemeId } from '$lib/themes'
-import {
-  directionOf,
-  resolveLocale,
-  translate,
-  type Locale,
-  type MessageKey
-} from '$lib/i18n'
+import { directionOf, resolveLocale, translate, type Locale, type MessageKey } from '$lib/i18n'
 
 export type FontWeight = 300 | 400 | 500 | 700
 export type ContentWidth = 'narrow' | 'medium' | 'wide'
@@ -57,7 +51,8 @@ const clamp = (value: number, min: number, max: number): number =>
 function loadSettings(): ReaderSettings {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return { ...DEFAULT_SETTINGS, locale: resolveLocale(undefined, false, systemLanguage()) }
+    if (!raw)
+      return { ...DEFAULT_SETTINGS, locale: resolveLocale(undefined, false, systemLanguage()) }
     const parsed = JSON.parse(raw) as Partial<ReaderSettings>
     const fontSize = clamp(Number(parsed.fontSize) || DEFAULT_SETTINGS.fontSize, 14, 24)
     const fontWeight = ([300, 400, 500, 700] as FontWeight[]).includes(

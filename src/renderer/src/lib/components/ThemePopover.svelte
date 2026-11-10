@@ -36,7 +36,9 @@
           ></span>
         </span>
         <span class="min-w-0 flex-1">
-          <span class="block truncate text-xs font-medium">{$t(`theme.${theme.id}` as MessageKey)}</span>
+          <span class="block truncate text-xs font-medium"
+            >{$t(`theme.${theme.id}` as MessageKey)}</span
+          >
           <span class="block truncate text-[10px] text-[var(--color-muted-foreground)]"
             >{$t(`theme.${theme.id}.hint` as MessageKey)}</span
           >

@@ -1,5 +1,6 @@
 import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron'
 import { join, extname, basename, resolve } from 'path'
+import { fileURLToPath } from 'url'
 import { readFile } from 'fs/promises'
 import { existsSync, watch, type FSWatcher } from 'fs'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
@@ -80,8 +81,21 @@ function createWindow(): BrowserWindow {
   })
 
   win.webContents.setWindowOpenHandler((details) => {
-    shell.openExternal(details.url)
+    handleLink(details.url)
     return { action: 'deny' }
+  })
+
+  // A plain link click would otherwise replace the reader with the target page
+  win.webContents.on('will-navigate', (event, url) => {
+    if (url === win.webContents.getURL()) return
+    if (
+      is.dev &&
+      process.env['ELECTRON_RENDERER_URL'] &&
+      url.startsWith(process.env['ELECTRON_RENDERER_URL'])
+    )
+      return
+    event.preventDefault()
+    handleLink(url)
   })
 
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
@@ -91,6 +105,28 @@ function createWindow(): BrowserWindow {
   }
 
   return win
+}
+
+const EXTERNAL_PROTOCOLS = new Set(['http:', 'https:', 'mailto:'])
+
+// Web links go to the browser; links to other Markdown files open in the reader
+function handleLink(url: string): void {
+  let parsed: URL
+  try {
+    parsed = new URL(url)
+  } catch {
+    return
+  }
+  if (EXTERNAL_PROTOCOLS.has(parsed.protocol)) {
+    shell.openExternal(parsed.href)
+    return
+  }
+  if (parsed.protocol === 'file:') {
+    const filePath = fileURLToPath(parsed)
+    if (ALLOWED_EXTENSIONS.has(extname(filePath).toLowerCase()) && existsSync(filePath)) {
+      openPathInWindow(filePath)
+    }
+  }
 }
 
 async function readMarkdownFile(filePath: string): Promise<OpenedFile> {

@@ -51,7 +51,8 @@
               >
             {/if}
           </span>
-          <span class="block text-[11px] text-[var(--color-muted-foreground)]">{$t(`aids.${toggle.key}Hint` as MessageKey)}</span
+          <span class="block text-[11px] text-[var(--color-muted-foreground)]"
+            >{$t(`aids.${toggle.key}Hint` as MessageKey)}</span
           >
         </span>
         <span

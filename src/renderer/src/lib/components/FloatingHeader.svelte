@@ -25,9 +25,7 @@
   let aidsOpen = $state(false)
 </script>
 
-<header
-  class="pointer-events-none fixed inset-x-0 top-0 z-40 flex justify-center px-4 pt-4"
->
+<header class="pointer-events-none fixed inset-x-0 top-0 z-40 flex justify-center px-4 pt-4">
   <div
     class="pointer-events-auto flex items-center gap-1 rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] px-2 py-1.5 shadow-lg backdrop-blur-md"
   >
@@ -45,8 +43,12 @@
 
     <Popover bind:open={fontOpen}>
       {#snippet trigger()}
-        <Button variant="ghost" size="icon" aria-label={$t('header.font')}
-          title={$t('header.font')}>
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label={$t('header.font')}
+          title={$t('header.font')}
+        >
           <Type class="h-4 w-4" />
         </Button>
       {/snippet}
@@ -57,8 +59,12 @@
 
     <Popover bind:open={themeOpen}>
       {#snippet trigger()}
-        <Button variant="ghost" size="icon" aria-label={$t('header.theme')}
-          title={$t('header.themeTitle')}>
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label={$t('header.theme')}
+          title={$t('header.themeTitle')}
+        >
           <Palette class="h-4 w-4" />
         </Button>
       {/snippet}
@@ -102,9 +108,7 @@
       onclick={() => settings.toggleLocale()}
     >
       <Languages class="h-4 w-4" />
-      <span class="text-xs font-semibold" lang="en"
-        >{$settings.locale === 'fa' ? 'EN' : 'FA'}</span
-      >
+      <span class="text-xs font-semibold" lang="en">{$settings.locale === 'fa' ? 'EN' : 'FA'}</span>
     </Button>
   </div>
 </header>

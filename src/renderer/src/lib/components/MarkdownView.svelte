@@ -1,11 +1,19 @@
 <script lang="ts">
-  import { applyBionic, renderMarkdown } from '$lib/utils/markdown'
+  import {
+    annotateDirection,
+    applyBionic,
+    renderMarkdown,
+    resolveImageSources
+  } from '$lib/utils/markdown'
   import { settings } from '$lib/stores/settings'
 
   let {
-    content
+    content,
+    fileDir = ''
   }: {
     content: string
+    /** Folder of the open document, used to resolve relative image paths */
+    fileDir?: string
   } = $props()
 
   const WIDTHS = { narrow: '44rem', medium: '58rem', wide: '78rem' } as const
@@ -17,7 +25,7 @@
   let activeIndex = -1
 
   let html = $derived.by(() => {
-    const rendered = renderMarkdown(content)
+    const rendered = resolveImageSources(annotateDirection(renderMarkdown(content)), fileDir)
     return $settings.bionic ? applyBionic(rendered) : rendered
   })
 
@@ -72,7 +80,6 @@
   bind:this={articleEl}
   class="markdown-body mx-auto px-6 pb-24 pt-24"
   class:spotlight={$settings.spotlight}
-  dir="rtl"
   style:max-width={WIDTHS[$settings.contentWidth]}
   style:--reader-font-size="{$settings.fontSize}px"
   style:--reader-font-weight={$settings.fontWeight}

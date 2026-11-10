@@ -21,6 +21,7 @@
   let mainEl: HTMLElement | undefined = $state()
 
   const hasContent = $derived(markdown.length > 0)
+  const fileDir = $derived(filePath.replace(/[\\/][^\\/]*$/, ''))
   const totalWords = $derived(countWords(markdown))
   const minutesLeft = $derived(Math.ceil((totalWords * (1 - progress)) / WORDS_PER_MINUTE))
 
@@ -166,7 +167,7 @@
     {/if}
 
     {#if hasContent}
-      <MarkdownView content={markdown} />
+      <MarkdownView content={markdown} {fileDir} />
     {:else}
       <DropZone active={true} onDropFiles={handleDroppedFiles} />
     {/if}
