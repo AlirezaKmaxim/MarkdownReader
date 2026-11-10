@@ -1,10 +1,9 @@
 {
   "name": "markdown-reader-pro",
-  "version": "1.1.0",
-  "description": "مارک‌داون خوان آرام — خواندن فایل‌های Markdown با فونت فارسی و فضای بدون حواس‌پرتی",
+  "version": "1.2.0",
+  "description": "Aram Markdown Reader — a calm, distraction-free Markdown reader for Persian (RTL) and English, with ADHD-friendly reading aids.",
   "main": "./out/main/index.js",
-  "author": "Markdown Reader Pro",
-  "homepage": "https://electron-vite.org",
+  "author": "Alireza karimi",
   "scripts": {
     "format": "prettier --plugin prettier-plugin-svelte --write .",
     "lint": "eslint --cache .",
@@ -52,5 +51,6 @@
     "typescript": "^5.9.3",
     "vite": "^7.2.6",
     "vitest": "^3.2.4"
-  }
+  },
+  "license": "MIT"
 }

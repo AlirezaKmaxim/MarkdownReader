@@ -1,5 +1,5 @@
 appId: com.markdownreader.pro
-productName: مارک‌داون خوان آرام
+productName: Aram Markdown Reader
 directories:
   buildResources: build
 files:
@@ -24,9 +24,9 @@ fileAssociations:
 win:
   executableName: MarkdownReaderPro
 nsis:
-  artifactName: MarkdownReaderPro-${version}-setup.${ext}
-  shortcutName: مارک‌داون خوان آرام
-  uninstallDisplayName: مارک‌داون خوان آرام
+  artifactName: Aram-Markdown-Reader-${version}-setup.${ext}
+  shortcutName: Aram Markdown Reader
+  uninstallDisplayName: Aram Markdown Reader
   createDesktopShortcut: always
   oneClick: false
   allowToChangeInstallationDirectory: true
@@ -38,7 +38,7 @@ dmg:
 linux:
   target:
     - AppImage
-  maintainer: markdownreader.pro
+  maintainer: Alireza karimi
   category: Utility
 appImage:
   artifactName: MarkdownReaderPro-${version}.${ext}
