@@ -1,28 +1,20 @@
 <script lang="ts">
   import Sparkles from 'lucide-svelte/icons/sparkles'
-  import { settings, type ContentWidth } from '$lib/stores/settings'
+  import { settings, t, type ContentWidth } from '$lib/stores/settings'
+  import type { MessageKey } from '$lib/i18n'
   import Slider from '$lib/components/ui/slider.svelte'
   import Button from '$lib/components/ui/button.svelte'
 
   type ToggleKey = 'ruler' | 'spotlight' | 'bionic' | 'wordSpacing'
 
-  const toggles: { key: ToggleKey; label: string; hint: string; shortcut?: string }[] = [
-    { key: 'ruler', label: 'خط‌کش خواندن', hint: 'نواری که همراه ماوس حرکت می‌کند', shortcut: 'R' },
-    {
-      key: 'spotlight',
-      label: 'تمرکز روی پاراگراف',
-      hint: 'بقیه متن کم‌رنگ می‌شود؛ با ↑↓ جابه‌جا شوید',
-      shortcut: 'P'
-    },
-    { key: 'bionic', label: 'خوانش بیونیک', hint: 'پررنگ کردن ابتدای کلمات لاتین', shortcut: 'B' },
-    { key: 'wordSpacing', label: 'فاصله بیشتر کلمات', hint: 'جدا کردن واضح‌تر کلمات' }
+  const toggles: { key: ToggleKey; shortcut?: string }[] = [
+    { key: 'ruler', shortcut: 'R' },
+    { key: 'spotlight', shortcut: 'P' },
+    { key: 'bionic', shortcut: 'B' },
+    { key: 'wordSpacing' }
   ]
 
-  const widths: { value: ContentWidth; label: string }[] = [
-    { value: 'narrow', label: 'باریک' },
-    { value: 'medium', label: 'متوسط' },
-    { value: 'wide', label: 'عریض' }
-  ]
+  const widths: ContentWidth[] = ['narrow', 'medium', 'wide']
 
   let lineHeight = $state($settings.lineHeight)
 
@@ -32,13 +24,13 @@
   }
 </script>
 
-<div class="w-72 space-y-4" dir="rtl">
+<div class="w-72 space-y-4">
   <Button class="w-full" onclick={() => settings.applyAdhdPreset()}>
     <Sparkles class="h-4 w-4" />
-    <span>حالت تمرکز ADHD</span>
+    <span>{$t('aids.adhdPreset')}</span>
   </Button>
   <p class="-mt-2 text-[11px] leading-5 text-[var(--color-muted-foreground)]">
-    تم زمردی، خطوط کوتاه، فاصله بیشتر و خط‌کش خواندن — یکجا.
+    {$t('aids.adhdHint')}
   </p>
 
   <div class="space-y-1">
@@ -52,14 +44,15 @@
       >
         <span class="min-w-0 flex-1">
           <span class="flex items-center gap-1.5 text-sm">
-            {toggle.label}
+            {$t(`aids.${toggle.key}` as MessageKey)}
             {#if toggle.shortcut}
               <kbd class="rounded border border-[var(--color-border)] px-1 text-[10px]"
                 >{toggle.shortcut}</kbd
               >
             {/if}
           </span>
-          <span class="block text-[11px] text-[var(--color-muted-foreground)]">{toggle.hint}</span>
+          <span class="block text-[11px] text-[var(--color-muted-foreground)]">{$t(`aids.${toggle.key}Hint` as MessageKey)}</span
+          >
         </span>
         <span
           class="relative h-5 w-9 shrink-0 rounded-full transition-colors {$settings[toggle.key]
@@ -80,7 +73,7 @@
 
   <div class="space-y-2">
     <div class="flex items-center justify-between text-sm">
-      <span class="text-[var(--color-muted-foreground)]">فاصله خطوط</span>
+      <span class="text-[var(--color-muted-foreground)]">{$t('aids.lineHeight')}</span>
       <span class="font-medium tabular-nums">{lineHeight.toFixed(2)}</span>
     </div>
     <Slider
@@ -88,21 +81,21 @@
       min={1.5}
       max={2.4}
       step={0.05}
-      aria-label="فاصله خطوط"
+      aria-label={$t('aids.lineHeight')}
       oninput={onLineHeightInput}
     />
   </div>
 
   <div class="space-y-2">
-    <span class="text-sm text-[var(--color-muted-foreground)]">عرض متن</span>
+    <span class="text-sm text-[var(--color-muted-foreground)]">{$t('aids.contentWidth')}</span>
     <div class="grid grid-cols-3 gap-1.5">
-      {#each widths as width (width.value)}
+      {#each widths as width (width)}
         <Button
           size="sm"
-          variant={$settings.contentWidth === width.value ? 'default' : 'outline'}
-          onclick={() => settings.patch({ contentWidth: width.value })}
+          variant={$settings.contentWidth === width ? 'default' : 'outline'}
+          onclick={() => settings.patch({ contentWidth: width })}
         >
-          {width.label}
+          {$t(`aids.width.${width}`)}
         </Button>
       {/each}
     </div>
@@ -116,6 +109,6 @@
       lineHeight = $settings.lineHeight
     }}
   >
-    بازگشت به تنظیمات پیش‌فرض
+    {$t('aids.reset')}
   </button>
 </div>

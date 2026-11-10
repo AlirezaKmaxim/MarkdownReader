@@ -22,6 +22,7 @@ const api = {
   getPathForFile: (file: File): string => webUtils.getPathForFile(file),
   setTitle: (title: string): Promise<void> => ipcRenderer.invoke('window:setTitle', title),
   openDefaultAppsSettings: (): Promise<void> => ipcRenderer.invoke('app:openDefaultAppsSettings'),
+  setLocale: (locale: 'fa' | 'en'): Promise<void> => ipcRenderer.invoke('app:setLocale', locale),
   onFileOpened: (callback: (file: OpenedFile) => void): (() => void) =>
     subscribe('file:opened', callback),
   onFileChanged: (callback: (file: OpenedFile) => void): (() => void) =>

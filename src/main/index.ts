@@ -5,7 +5,32 @@ import { existsSync, watch, type FSWatcher } from 'fs'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 
-const APP_TITLE = 'مارک‌داون خوان آرام'
+type Locale = 'fa' | 'en'
+
+// The renderer owns the language setting and mirrors it here (app:setLocale)
+const MAIN_MESSAGES = {
+  fa: {
+    appTitle: 'مارک‌داون خوان آرام',
+    unsupported: 'فقط فایل‌های .md و .txt پشتیبانی می‌شوند',
+    openError: 'خطا در باز کردن فایل',
+    dialogTitle: 'انتخاب فایل مارک‌داون'
+  },
+  en: {
+    appTitle: 'Aram Markdown Reader',
+    unsupported: 'Only .md and .txt files are supported',
+    openError: 'Could not open the file',
+    dialogTitle: 'Choose a Markdown file'
+  }
+} satisfies Record<Locale, Record<string, string>>
+
+let locale: Locale = 'fa'
+let currentFileName: string | null = null
+
+const msg = (key: keyof (typeof MAIN_MESSAGES)['fa']): string => MAIN_MESSAGES[locale][key]
+
+function windowTitle(): string {
+  return currentFileName ? `${currentFileName} — ${msg('appTitle')}` : msg('appTitle')
+}
 const ALLOWED_EXTENSIONS = new Set(['.md', '.txt', '.markdown'])
 
 type OpenedFile = { content: string; name: string; path: string }
@@ -35,7 +60,7 @@ function createWindow(): BrowserWindow {
     minHeight: 480,
     show: false,
     autoHideMenuBar: true,
-    title: APP_TITLE,
+    title: msg('appTitle'),
     icon,
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
@@ -71,7 +96,7 @@ function createWindow(): BrowserWindow {
 async function readMarkdownFile(filePath: string): Promise<OpenedFile> {
   const ext = extname(filePath).toLowerCase()
   if (!ALLOWED_EXTENSIONS.has(ext)) {
-    throw new Error('فقط فایل‌های .md و .txt پشتیبانی می‌شوند')
+    throw new Error(msg('unsupported'))
   }
   const content = await readFile(filePath, 'utf-8')
   return { content, name: basename(filePath), path: filePath }
@@ -106,7 +131,8 @@ function watchFile(win: BrowserWindow, filePath: string): void {
 
 async function loadFileForWindow(win: BrowserWindow, filePath: string): Promise<OpenedFile> {
   const file = await readMarkdownFile(filePath)
-  win.setTitle(`${file.name} — ${APP_TITLE}`)
+  currentFileName = file.name
+  win.setTitle(windowTitle())
   watchFile(win, file.path)
   return file
 }
@@ -122,7 +148,7 @@ async function openPathInWindow(filePath: string): Promise<void> {
     const file = await loadFileForWindow(mainWindow, filePath)
     mainWindow.webContents.send('file:opened', file)
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'خطا در باز کردن فایل'
+    const message = err instanceof Error ? err.message : msg('openError')
     mainWindow.webContents.send('file:error', message)
   }
 }
@@ -157,7 +183,7 @@ if (!app.requestSingleInstanceLock()) {
     ipcMain.handle('dialog:openFile', async (event) => {
       const win = BrowserWindow.fromWebContents(event.sender)
       const options: Electron.OpenDialogOptions = {
-        title: 'انتخاب فایل مارک‌داون',
+        title: msg('dialogTitle'),
         properties: ['openFile'],
         filters: [
           { name: 'Markdown', extensions: ['md', 'markdown', 'txt'] },
@@ -194,8 +220,14 @@ if (!app.requestSingleInstanceLock()) {
     ipcMain.handle('window:setTitle', (event, title: string) => {
       const win = BrowserWindow.fromWebContents(event.sender)
       if (win) {
-        win.setTitle(title || APP_TITLE)
+        win.setTitle(title || msg('appTitle'))
       }
+    })
+
+    ipcMain.handle('app:setLocale', (event, next: unknown) => {
+      if (next !== 'fa' && next !== 'en') return
+      locale = next
+      BrowserWindow.fromWebContents(event.sender)?.setTitle(windowTitle())
     })
 
     // Windows 10/11 don't let apps silently become the default handler;

@@ -14,6 +14,7 @@ export type MarkdownReaderApi = {
   getPathForFile: (file: File) => string
   setTitle: (title: string) => Promise<void>
   openDefaultAppsSettings: () => Promise<void>
+  setLocale: (locale: 'fa' | 'en') => Promise<void>
   onFileOpened: (callback: (file: OpenedFile) => void) => () => void
   onFileChanged: (callback: (file: OpenedFile) => void) => () => void
   onFileError: (callback: (message: string) => void) => () => void

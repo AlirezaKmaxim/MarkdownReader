@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { t } from '$lib/stores/settings'
+
   let {
     active = false,
     onDropFiles
@@ -42,7 +44,7 @@
   <div
     class="flex h-full items-center justify-center px-6"
     role="region"
-    aria-label="ناحیه رها کردن فایل"
+    aria-label={$t('drop.region')}
     ondragover={onDragOver}
     ondragleave={onDragLeave}
     ondrop={onDrop}
@@ -51,11 +53,10 @@
       class="w-full max-w-xl rounded-3xl border-2 border-dashed px-8 py-16 text-center transition-colors {dragging
         ? 'border-[var(--color-accent)] bg-[var(--color-muted)]'
         : 'border-[var(--color-border)] bg-[var(--color-card)]'}"
-      dir="rtl"
     >
-      <p class="text-xl font-medium text-[var(--color-foreground)]">فایل را اینجا رها کنید</p>
+      <p class="text-xl font-medium text-[var(--color-foreground)]">{$t('drop.title')}</p>
       <p class="mt-3 text-sm text-[var(--color-muted-foreground)]">
-        فایل‌های .md و .txt پشتیبانی می‌شوند — یا از دکمه «باز کردن فایل» استفاده کنید
+        {$t('drop.hint')}
       </p>
       {#if window.api.platform === 'win32'}
         <button
@@ -63,7 +64,7 @@
           class="mt-6 text-xs text-[var(--color-accent)] underline underline-offset-4 hover:opacity-80"
           onclick={() => window.api.openDefaultAppsSettings()}
         >
-          تنظیم به‌عنوان برنامه پیش‌فرض فایل‌های Markdown
+          {$t('drop.setDefault')}
         </button>
       {/if}
     </div>

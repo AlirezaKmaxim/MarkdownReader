@@ -4,7 +4,8 @@
   import DropZone from '$lib/components/DropZone.svelte'
   import MarkdownView from '$lib/components/MarkdownView.svelte'
   import ReadingRuler from '$lib/components/ReadingRuler.svelte'
-  import { settings } from '$lib/stores/settings'
+  import { settings, t } from '$lib/stores/settings'
+  import { formatNumber } from '$lib/i18n'
   import { countWords } from '$lib/utils/markdown'
 
   type OpenedFile = Awaited<ReturnType<typeof window.api.readFilePath>>
@@ -36,7 +37,7 @@
     window.api
       .getInitialFile()
       .then((file) => file && showFile(file))
-      .catch((err) => (error = err instanceof Error ? err.message : 'خطا در باز کردن فایل'))
+      .catch((err) => (error = err instanceof Error ? err.message : $t('error.open')))
 
     const unsubscribers = [
       window.api.onFileOpened(showFile),
@@ -55,14 +56,14 @@
       const file = await window.api.openFile()
       if (file) showFile(file)
     } catch (err) {
-      error = err instanceof Error ? err.message : 'خطا در باز کردن فایل'
+      error = err instanceof Error ? err.message : $t('error.open')
     }
   }
 
   async function handleDroppedFiles(files: FileList): Promise<void> {
     const file = Array.from(files).find((item) => /\.(md|markdown|txt)$/i.test(item.name))
     if (!file) {
-      error = 'فقط فایل‌های .md و .txt پشتیبانی می‌شوند'
+      error = $t('error.unsupported')
       return
     }
 
@@ -75,9 +76,9 @@
       }
 
       showFile({ content: await file.text(), name: file.name, path: '' })
-      await window.api.setTitle(`${file.name} — مارک‌داون خوان آرام`)
+      await window.api.setTitle(`${file.name} — ${$t('app.title')}`)
     } catch (err) {
-      error = err instanceof Error ? err.message : 'خطا در خواندن فایل'
+      error = err instanceof Error ? err.message : $t('error.read')
     }
   }
 
@@ -159,7 +160,6 @@
     {#if error}
       <div
         class="mx-auto mt-24 max-w-xl rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-center text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-200"
-        dir="rtl"
       >
         {error}
       </div>
@@ -181,25 +181,24 @@
       type="button"
       class="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-full border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-xs text-[var(--color-muted-foreground)] opacity-40 backdrop-blur transition hover:opacity-100"
       onclick={toggleFocus}
-      dir="rtl"
     >
-      خروج از تمرکز (Esc / F11)
+      {$t('focus.exit')}
     </button>
   {/if}
 
   {#if hasContent && !focusMode}
     <div
       class="pointer-events-none fixed bottom-3 inset-x-4 z-40 flex items-center justify-between text-xs text-[var(--color-muted-foreground)]"
-      dir="rtl"
     >
       <span>{fileName}</span>
       <span class="tabular-nums">
         {#if minutesLeft > 0}
-          {minutesLeft.toLocaleString('fa-IR')} دقیقه مانده · {Math.round(
-            progress * 100
-          ).toLocaleString('fa-IR')}٪
+          {$t('status.minutesLeft', {
+            minutes: formatNumber($settings.locale, minutesLeft),
+            percent: formatNumber($settings.locale, Math.round(progress * 100))
+          })}
         {:else}
-          پایان متن ✓
+          {$t('status.done')}
         {/if}
       </span>
     </div>

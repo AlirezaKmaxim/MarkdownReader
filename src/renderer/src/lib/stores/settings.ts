@@ -1,5 +1,12 @@
-import { writable } from 'svelte/store'
+import { derived, writable } from 'svelte/store'
 import { getTheme, isThemeId, THEMES, type ThemeId } from '$lib/themes'
+import {
+  directionOf,
+  resolveLocale,
+  translate,
+  type Locale,
+  type MessageKey
+} from '$lib/i18n'
 
 export type FontWeight = 300 | 400 | 500 | 700
 export type ContentWidth = 'narrow' | 'medium' | 'wide'
@@ -14,6 +21,7 @@ export type ReaderSettings = {
   ruler: boolean
   spotlight: boolean
   bionic: boolean
+  locale: Locale
 }
 
 const STORAGE_KEY = 'markdown-reader-pro:settings'
@@ -27,7 +35,8 @@ const DEFAULT_SETTINGS: ReaderSettings = {
   wordSpacing: false,
   ruler: false,
   spotlight: false,
-  bionic: false
+  bionic: false,
+  locale: 'fa'
 }
 
 // One-click preset tuned for readers with ADHD: calm low-glare palette,
@@ -48,7 +57,7 @@ const clamp = (value: number, min: number, max: number): number =>
 function loadSettings(): ReaderSettings {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return { ...DEFAULT_SETTINGS }
+    if (!raw) return { ...DEFAULT_SETTINGS, locale: resolveLocale(undefined, false, systemLanguage()) }
     const parsed = JSON.parse(raw) as Partial<ReaderSettings>
     const fontSize = clamp(Number(parsed.fontSize) || DEFAULT_SETTINGS.fontSize, 14, 24)
     const fontWeight = ([300, 400, 500, 700] as FontWeight[]).includes(
@@ -72,11 +81,24 @@ function loadSettings(): ReaderSettings {
       wordSpacing: Boolean(parsed.wordSpacing),
       ruler: Boolean(parsed.ruler),
       spotlight: Boolean(parsed.spotlight),
-      bionic: Boolean(parsed.bionic)
+      bionic: Boolean(parsed.bionic),
+      locale: resolveLocale(parsed.locale, true, systemLanguage())
     }
   } catch {
-    return { ...DEFAULT_SETTINGS }
+    return { ...DEFAULT_SETTINGS, locale: resolveLocale(undefined, false, systemLanguage()) }
   }
+}
+
+function systemLanguage(): string {
+  return typeof navigator !== 'undefined' ? navigator.language : 'en'
+}
+
+function applyLocale(locale: Locale): void {
+  const root = document.documentElement
+  root.lang = locale
+  root.dir = directionOf(locale)
+  document.title = translate(locale, 'app.title')
+  window.api?.setLocale?.(locale)
 }
 
 function applyTheme(theme: ThemeId): void {
@@ -87,7 +109,7 @@ function applyTheme(theme: ThemeId): void {
 
 function createSettingsStore() {
   const initial = typeof localStorage !== 'undefined' ? loadSettings() : { ...DEFAULT_SETTINGS }
-  const { subscribe, update, set } = writable<ReaderSettings>(initial)
+  const { subscribe, update } = writable<ReaderSettings>(initial)
 
   function persist(value: ReaderSettings): void {
     try {
@@ -96,6 +118,7 @@ function createSettingsStore() {
       // Storage unavailable — settings still apply for this session
     }
     applyTheme(value.theme)
+    applyLocale(value.locale)
   }
 
   function patch(changes: Partial<ReaderSettings>): void {
@@ -107,6 +130,7 @@ function createSettingsStore() {
   }
 
   applyTheme(initial.theme)
+  applyLocale(initial.locale)
 
   return {
     subscribe,
@@ -116,6 +140,16 @@ function createSettingsStore() {
     },
     setFontWeight(weight: FontWeight) {
       patch({ fontWeight: weight })
+    },
+    setLocale(locale: Locale) {
+      patch({ locale })
+    },
+    toggleLocale() {
+      update((current) => {
+        const next: ReaderSettings = { ...current, locale: current.locale === 'fa' ? 'en' : 'fa' }
+        persist(next)
+        return next
+      })
     },
     setTheme(theme: ThemeId) {
       patch({ theme })
@@ -142,10 +176,23 @@ function createSettingsStore() {
       patch(ADHD_PRESET)
     },
     reset() {
-      set({ ...DEFAULT_SETTINGS })
-      persist(DEFAULT_SETTINGS)
+      // Resetting the look should not switch the interface language
+      update((current) => {
+        const next = { ...DEFAULT_SETTINGS, locale: current.locale }
+        persist(next)
+        return next
+      })
     }
   }
 }
 
 export const settings = createSettingsStore()
+
+export const locale = derived(settings, ($settings) => $settings.locale)
+
+export const t = derived(
+  settings,
+  ($settings) =>
+    (key: MessageKey, params?: Record<string, string | number>): string =>
+      translate($settings.locale, key, params)
+)

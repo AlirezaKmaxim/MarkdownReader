@@ -1,13 +1,14 @@
 <script lang="ts">
   import Check from 'lucide-svelte/icons/check'
-  import { settings } from '$lib/stores/settings'
+  import { settings, t } from '$lib/stores/settings'
+  import type { MessageKey } from '$lib/i18n'
   import { THEMES } from '$lib/themes'
   import { cn } from '$lib/utils'
 </script>
 
-<div class="w-72 space-y-2" dir="rtl">
+<div class="w-72 space-y-2">
   <div class="flex items-center justify-between text-sm">
-    <span class="text-[var(--color-muted-foreground)]">تم</span>
+    <span class="text-[var(--color-muted-foreground)]">{$t('theme.heading')}</span>
     <kbd class="rounded border border-[var(--color-border)] px-1.5 text-[10px]">T</kbd>
   </div>
   <div class="grid grid-cols-2 gap-1.5">
@@ -28,16 +29,16 @@
           style:background={theme.swatch.bg}
           style:color={theme.swatch.fg}
         >
-          آ
+          {$t('theme.swatch')}
           <span
             class="absolute bottom-1 end-1 h-1.5 w-1.5 rounded-full"
             style:background={theme.swatch.accent}
           ></span>
         </span>
         <span class="min-w-0 flex-1">
-          <span class="block truncate text-xs font-medium">{theme.label}</span>
+          <span class="block truncate text-xs font-medium">{$t(`theme.${theme.id}` as MessageKey)}</span>
           <span class="block truncate text-[10px] text-[var(--color-muted-foreground)]"
-            >{theme.hint}</span
+            >{$t(`theme.${theme.id}.hint` as MessageKey)}</span
           >
         </span>
         {#if $settings.theme === theme.id}
