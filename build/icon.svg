@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4f46e5"/>
+      <stop offset="0.55" stop-color="#6d28d9"/>
+      <stop offset="1" stop-color="#3b0764"/>
+    </linearGradient>
+    <linearGradient id="page" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fffdf8"/>
+      <stop offset="1" stop-color="#f1ece2"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#1e0b3a" flood-opacity="0.45"/>
+    </filter>
+  </defs>
+
+  <rect x="32" y="32" width="960" height="960" rx="220" fill="url(#bg)"/>
+  <circle cx="820" cy="190" r="260" fill="#ffffff" opacity="0.06"/>
+
+  <!-- open book -->
+  <g filter="url(#shadow)">
+    <path d="M512 330 C 430 280 310 268 200 290 L 200 760 C 310 738 430 750 512 800 Z" fill="url(#page)"/>
+    <path d="M512 330 C 594 280 714 268 824 290 L 824 760 C 714 738 594 750 512 800 Z" fill="url(#page)"/>
+    <path d="M512 330 L 512 800" stroke="#d9d0c1" stroke-width="8"/>
+  </g>
+
+  <!-- right page: colored "heading" and text lines -->
+  <g stroke-linecap="round" stroke-width="26">
+    <line x1="580" y1="395" x2="760" y2="380" stroke="#2563eb"/>
+    <line x1="580" y1="470" x2="760" y2="458" stroke="#c4b5fd"/>
+    <line x1="580" y1="535" x2="730" y2="525" stroke="#c4b5fd"/>
+    <line x1="580" y1="610" x2="760" y2="600" stroke="#f59e0b"/>
+    <line x1="580" y1="675" x2="700" y2="668" stroke="#c4b5fd"/>
+  </g>
+
+  <!-- left page: markdown mark -->
+  <g fill="none" stroke="#6d28d9" stroke-width="30" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M258 600 L 258 440 L 318 520 L 378 440 L 378 600"/>
+    <path d="M440 450 L 440 590 M 405 555 L 440 595 L 475 555"/>
+  </g>
+</svg>

@@ -1,0 +1,403 @@
+@import 'tailwindcss';
+@import '@fontsource/vazirmatn/300.css';
+@import '@fontsource/vazirmatn/400.css';
+@import '@fontsource/vazirmatn/500.css';
+@import '@fontsource/vazirmatn/700.css';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: 'Vazirmatn', ui-sans-serif, system-ui, sans-serif;
+  --color-background: #f7f5f2;
+  --color-foreground: #1c1917;
+  --color-muted: #e7e5e4;
+  --color-muted-foreground: #78716c;
+  --color-card: #ffffffcc;
+  --color-border: #d6d3d1;
+  --color-accent: #0f766e;
+  --color-accent-foreground: #f0fdfa;
+  --color-popover: #ffffff;
+  --color-ring: #0d9488;
+}
+
+.dark,
+[data-theme='dark'] {
+  --color-background: #1c1917;
+  --color-foreground: #f5f5f4;
+  --color-muted: #292524;
+  --color-muted-foreground: #a8a29e;
+  --color-card: #292524cc;
+  --color-border: #44403c;
+  --color-accent: #2dd4bf;
+  --color-accent-foreground: #042f2e;
+  --color-popover: #292524;
+  --color-ring: #2dd4bf;
+}
+
+/* Claude — warm cream paper with terracotta accent */
+[data-theme='claude'] {
+  --color-background: #faf9f5;
+  --color-foreground: #29261b;
+  --color-muted: #f0eee6;
+  --color-muted-foreground: #73726c;
+  --color-card: #fffdf8d9;
+  --color-border: #e5e2d8;
+  --color-accent: #c96442;
+  --color-accent-foreground: #ffffff;
+  --color-popover: #fffdf8;
+  --color-ring: #d97757;
+  --color-heading: #1f1e1d;
+}
+
+[data-theme='claude-dark'] {
+  --color-background: #262624;
+  --color-foreground: #ece9e0;
+  --color-muted: #30302e;
+  --color-muted-foreground: #a6a39a;
+  --color-card: #30302ecc;
+  --color-border: #44433f;
+  --color-accent: #d97757;
+  --color-accent-foreground: #1a1915;
+  --color-popover: #30302e;
+  --color-ring: #d97757;
+  --color-heading: #faf9f5;
+}
+
+/* Twitter / X — crisp white and the classic blue */
+[data-theme='twitter'] {
+  --color-background: #ffffff;
+  --color-foreground: #0f1419;
+  --color-muted: #eff3f4;
+  --color-muted-foreground: #536471;
+  --color-card: #ffffffd9;
+  --color-border: #cfd9de;
+  --color-accent: #1d9bf0;
+  --color-accent-foreground: #ffffff;
+  --color-popover: #ffffff;
+  --color-ring: #1d9bf0;
+}
+
+[data-theme='twitter-dim'] {
+  --color-background: #15202b;
+  --color-foreground: #f7f9f9;
+  --color-muted: #1e2732;
+  --color-muted-foreground: #8b98a5;
+  --color-card: #1e2732cc;
+  --color-border: #38444d;
+  --color-accent: #1d9bf0;
+  --color-accent-foreground: #ffffff;
+  --color-popover: #1e2732;
+  --color-ring: #1d9bf0;
+}
+
+/* Emerald focus — soft mint paper that cuts glare, deep green ink for
+   steady contrast without the harshness of pure black on white */
+[data-theme='emerald'] {
+  --color-background: #e8f3ec;
+  --color-foreground: #12261e;
+  --color-muted: #d5e8dc;
+  --color-muted-foreground: #4b6b5c;
+  --color-card: #f4faf6d9;
+  --color-border: #bcd7c6;
+  --color-accent: #047857;
+  --color-accent-foreground: #ecfdf5;
+  --color-popover: #f4faf6;
+  --color-ring: #10b981;
+  --color-heading: #065f46;
+}
+
+[data-theme='emerald-dark'] {
+  --color-background: #0c1f19;
+  --color-foreground: #d3eadf;
+  --color-muted: #133229;
+  --color-muted-foreground: #86a99a;
+  --color-card: #133229cc;
+  --color-border: #1f4a3c;
+  --color-accent: #34d399;
+  --color-accent-foreground: #022c22;
+  --color-popover: #11291f;
+  --color-ring: #34d399;
+  --color-heading: #6ee7b7;
+}
+
+/* Element tints for headings, emphasis and code. Mixed with the theme
+   accent so each theme keeps its own character. */
+:root {
+  --md-h1: var(--color-heading, var(--color-accent));
+  --md-h2: color-mix(in srgb, #2563eb 75%, var(--color-accent));
+  --md-h3: color-mix(in srgb, #9333ea 70%, var(--color-accent));
+  --md-h4: color-mix(in srgb, #c2410c 75%, var(--color-accent));
+  --md-strong: color-mix(in srgb, #b45309 70%, var(--color-foreground));
+  --md-em: color-mix(in srgb, #0e7490 70%, var(--color-foreground));
+  --md-code: #be185d;
+  --md-code-bg: color-mix(in srgb, #be185d 9%, transparent);
+  --md-mark: color-mix(in srgb, #facc15 45%, transparent);
+}
+
+.dark {
+  --md-h1: var(--color-heading, var(--color-accent));
+  --md-h2: color-mix(in srgb, #60a5fa 80%, var(--color-accent));
+  --md-h3: color-mix(in srgb, #c084fc 80%, var(--color-accent));
+  --md-h4: color-mix(in srgb, #fb923c 80%, var(--color-accent));
+  --md-strong: color-mix(in srgb, #fbbf24 75%, var(--color-foreground));
+  --md-em: color-mix(in srgb, #67e8f9 70%, var(--color-foreground));
+  --md-code: #f9a8d4;
+  --md-code-bg: color-mix(in srgb, #f472b6 14%, transparent);
+  --md-mark: color-mix(in srgb, #facc15 30%, transparent);
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-accent) 28%, transparent);
+}
+
+html,
+body,
+#app {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--color-background);
+  color: var(--color-foreground);
+  overflow: hidden;
+}
+
+/* Thin themed scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--color-muted-foreground);
+}
+
+.markdown-body {
+  font-size: var(--reader-font-size, 16px);
+  font-weight: var(--reader-font-weight, 400);
+  line-height: var(--reader-line-height, 1.85);
+  word-spacing: var(--reader-word-spacing, normal);
+  word-break: break-word;
+  transition:
+    max-width 0.25s ease,
+    line-height 0.2s ease;
+}
+
+.markdown-body :where(h1, h2, h3, h4, h5, h6) {
+  font-weight: 700;
+  color: var(--color-heading, inherit);
+  line-height: 1.4;
+  margin: 1.4em 0 0.6em;
+}
+
+.markdown-body h1 {
+  font-size: 1.75em;
+  color: var(--md-h1);
+  padding-bottom: 0.3em;
+  border-bottom: 2px solid color-mix(in srgb, var(--md-h1) 30%, transparent);
+}
+
+.markdown-body h2 {
+  font-size: 1.4em;
+  color: var(--md-h2);
+  padding-inline-start: 0.6em;
+  border-inline-start: 4px solid var(--md-h2);
+}
+
+.markdown-body h3 {
+  font-size: 1.2em;
+  color: var(--md-h3);
+}
+
+.markdown-body :where(h4, h5, h6) {
+  color: var(--md-h4);
+}
+
+.markdown-body strong {
+  color: var(--md-strong);
+}
+
+.markdown-body em {
+  color: var(--md-em);
+}
+
+.markdown-body mark {
+  background: var(--md-mark);
+  color: inherit;
+  padding: 0 0.2em;
+  border-radius: 0.25em;
+}
+
+.markdown-body li::marker {
+  color: var(--color-accent);
+}
+
+.markdown-body p {
+  margin: 0.75em 0;
+}
+
+.markdown-body :where(ul, ol) {
+  margin: 0.75em 0;
+  padding-inline-start: 8px;
+  list-style-position: outside;
+}
+
+.markdown-body ul {
+  list-style-type: disc;
+}
+
+.markdown-body ol {
+  list-style-type: decimal;
+}
+
+.markdown-body li {
+  margin: 0.25em 0;
+  padding-inline-start: 0.5em;
+}
+
+.markdown-body :where(ul ul, ol ul) {
+  list-style-type: circle;
+  padding-inline-start: 8px;
+}
+
+.markdown-body :where(ul ol, ol ol) {
+  padding-inline-start: 8px;
+}
+
+.markdown-body blockquote {
+  margin: 1em 0;
+  padding: 0.25em 1em;
+  border-inline-start: 3px solid var(--color-accent);
+  border-radius: 0.5em;
+  background: color-mix(in srgb, var(--color-accent) 6%, transparent);
+  color: var(--color-muted-foreground);
+}
+
+.markdown-body code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.9em;
+  color: var(--md-code);
+  background: var(--md-code-bg);
+  padding: 0.15em 0.4em;
+  border-radius: 0.35em;
+}
+
+.markdown-body pre {
+  background: var(--color-muted);
+  padding: 1em;
+  border-radius: 0.75em;
+  overflow-x: auto;
+  direction: ltr;
+  text-align: left;
+}
+
+.markdown-body pre code {
+  color: inherit;
+  background: transparent;
+  padding: 0;
+}
+
+.markdown-body a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.markdown-body hr {
+  border: none;
+  border-top: 1px solid var(--color-border);
+  margin: 1.5em 0;
+}
+
+/* Tables: rounded card, tinted header, zebra rows; wide tables scroll */
+.markdown-body .table-wrap {
+  margin: 1.25em 0;
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: 0.75em;
+  background: var(--color-card);
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--color-foreground) 6%, transparent);
+}
+
+.markdown-body table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95em;
+  line-height: 1.6;
+}
+
+.markdown-body th {
+  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+  color: var(--color-heading, var(--color-foreground));
+  font-weight: 700;
+  text-align: start;
+  white-space: nowrap;
+  border-bottom: 2px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
+}
+
+.markdown-body :where(th, td) {
+  padding: 0.6em 0.9em;
+}
+
+.markdown-body td {
+  border-top: 1px solid var(--color-border);
+}
+
+.markdown-body :where(th, td) + :where(th, td) {
+  border-inline-start: 1px solid color-mix(in srgb, var(--color-border) 60%, transparent);
+}
+
+.markdown-body tbody tr:nth-child(even) {
+  background: color-mix(in srgb, var(--color-muted) 55%, transparent);
+}
+
+.markdown-body tbody tr:hover {
+  background: color-mix(in srgb, var(--color-accent) 8%, transparent);
+}
+
+.markdown-body tbody tr:first-child td {
+  border-top: none;
+}
+
+.markdown-body img {
+  max-width: 100%;
+  border-radius: 0.5em;
+}
+
+/* Bionic reading: bold word stems to give the eye fixation points */
+.markdown-body b.bionic {
+  font-weight: 700;
+}
+
+/* Paragraph spotlight: dim everything except the block being read */
+.markdown-body.spotlight .focus-unit {
+  opacity: 0.22;
+  transition: opacity 0.2s ease;
+}
+
+.markdown-body.spotlight .focus-unit.is-active {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .markdown-body,
+  .markdown-body.spotlight .focus-unit {
+    transition: none;
+  }
+}

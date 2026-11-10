@@ -1,0 +1,45 @@
+appId: com.markdownreader.pro
+productName: مارک‌داون خوان آرام
+directories:
+  buildResources: build
+files:
+  - '!**/.vscode/*'
+  - '!src/*'
+  - '!electron.vite.config.{js,ts,mjs,cjs}'
+  - '!svelte.config.mjs'
+  - '!{.eslintcache,eslint.config.mjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
+  - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
+  - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
+asarUnpack:
+  - 'resources/**'
+fileAssociations:
+  - ext: md
+    name: Markdown Document
+    description: Markdown Document
+    role: Viewer
+  - ext: markdown
+    name: Markdown Document
+    description: Markdown Document
+    role: Viewer
+win:
+  executableName: MarkdownReaderPro
+nsis:
+  artifactName: MarkdownReaderPro-${version}-setup.${ext}
+  shortcutName: مارک‌داون خوان آرام
+  uninstallDisplayName: مارک‌داون خوان آرام
+  createDesktopShortcut: always
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+mac:
+  entitlementsInherit: build/entitlements.mac.plist
+  notarize: false
+dmg:
+  artifactName: MarkdownReaderPro-${version}.${ext}
+linux:
+  target:
+    - AppImage
+  maintainer: markdownreader.pro
+  category: Utility
+appImage:
+  artifactName: MarkdownReaderPro-${version}.${ext}
+npmRebuild: false
